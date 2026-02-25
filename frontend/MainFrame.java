@@ -52,8 +52,7 @@ public class MainFrame extends JFrame {
         // ===== ACTIONS =====
         loginBtn.addActionListener(e -> new LoginFrame().setVisible(true));
 
-        signupBtn.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Signup screen coming soon"));
+        signupBtn.addActionListener(e -> new SignupFrame().setVisible(true));
     }
 
     private JButton createButton(String text, Color normal, Color hover) {
