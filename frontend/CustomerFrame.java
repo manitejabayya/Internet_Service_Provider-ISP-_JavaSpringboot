@@ -6,20 +6,20 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class AdminFrame extends JFrame {
+public class CustomerFrame extends JFrame {
 
-    private float imageScale = 0.3f;
     private float imageAlpha = 0f;
     private float imageRotation = 0f;
 
-    public AdminFrame() {
+    public CustomerFrame() {
 
-        setTitle("ISP Admin Dashboard");
+        setTitle("ISP Customer Dashboard");
         setSize(750, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(600, 500));
 
+        // ===== Background Panel with Animation =====
         JPanel mainPanel = new JPanel(new BorderLayout()) {
 
             private BufferedImage ispImage;
@@ -28,7 +28,7 @@ public class AdminFrame extends JFrame {
                 try {
                     ispImage = ImageIO.read(new File("assests/isp.png"));
                 } catch (Exception e) {
-                    System.err.println("Could not load image: " + e.getMessage());
+                    System.err.println("Image not found: " + e.getMessage());
                 }
             }
 
@@ -46,6 +46,7 @@ public class AdminFrame extends JFrame {
                             getWidth() / 2.0,
                             getHeight() / 2.0
                     );
+
                     at.rotate(Math.toRadians(imageRotation * 0.3));
                     at.scale(scale, scale);
                     at.translate(-ispImage.getWidth() / 2.0,
@@ -64,14 +65,15 @@ public class AdminFrame extends JFrame {
             }
         };
 
-        JLabel title = new JLabel("Welcome to ISP Admin Panel",
+        // ===== TITLE =====
+        JLabel title = new JLabel("Welcome to ISP Customer Panel",
                 SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setForeground(Color.WHITE);
         title.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // 🔥 Changed to 4 buttons only
-        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 15, 15));
+        // ===== BUTTON PANEL =====
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 15, 15));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 170, 30, 170));
         buttonPanel.setOpaque(false);
 
@@ -80,15 +82,20 @@ public class AdminFrame extends JFrame {
                 new Color(14, 165, 233),
                 new Color(56, 189, 248));
 
-        JButton viewCustomers = createStyledButton(
-                "View Customers",
+        JButton currentPlan = createStyledButton(
+                "Current Plan",
                 new Color(16, 185, 129),
                 new Color(34, 197, 94));
 
-        JButton managePlans = createStyledButton(
-                "Manage Plans",
+        JButton plans = createStyledButton(
+                "Plans",
                 new Color(168, 85, 247),
                 new Color(139, 92, 246));
+
+        JButton profile = createStyledButton(
+                "Profile",
+                new Color(59, 130, 246),
+                new Color(37, 99, 235));
 
         JButton exit = createStyledButton(
                 "Exit",
@@ -96,8 +103,9 @@ public class AdminFrame extends JFrame {
                 new Color(220, 38, 38));
 
         buttonPanel.add(dashboard);
-        buttonPanel.add(viewCustomers);
-        buttonPanel.add(managePlans);
+        buttonPanel.add(currentPlan);
+        buttonPanel.add(plans);
+        buttonPanel.add(profile);
         buttonPanel.add(exit);
 
         mainPanel.add(title, BorderLayout.NORTH);
@@ -105,25 +113,25 @@ public class AdminFrame extends JFrame {
 
         add(mainPanel);
 
-        // Animation
+        // ===== Animation Timer =====
         Timer animationTimer = new Timer(16, e -> {
             if (imageAlpha < 1.0f)
                 imageAlpha = Math.min(imageAlpha + 0.02f, 1.0f);
 
-            imageScale = Math.min(imageScale + 0.015f, 1.0f);
             imageRotation = (imageRotation + 0.5f) % 360;
-
             mainPanel.repaint();
         });
         animationTimer.start();
 
-        // Navigation
-        dashboard.addActionListener(e -> new Dashboard());
-        viewCustomers.addActionListener(e -> new ViewCustomers());
-        managePlans.addActionListener(e -> new Plans());
+        // ===== Navigation (Create These Classes Later) =====
+        dashboard.addActionListener(e -> new CustomerDashboard());
+        currentPlan.addActionListener(e -> new CurrentPlan());
+        plans.addActionListener(e -> new CustomerPlans());
+        profile.addActionListener(e -> new CustomerProfile());
         exit.addActionListener(e -> System.exit(0));
     }
 
+    // ===== Stylish Button =====
     private static JButton createStyledButton(String text,
                                               Color normal,
                                               Color hover) {
@@ -166,6 +174,6 @@ public class AdminFrame extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
-                new AdminFrame().setVisible(true));
+                new CustomerFrame().setVisible(true));
     }
 }
