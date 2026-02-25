@@ -1,8 +1,15 @@
 import javax.swing.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class MainFrame {
+    private static float imageScale = 0.3f;
+    private static float imageAlpha = 0f;
+    private static float imageRotation = 0f;
 
     public static void main(String[] args) {
 
@@ -16,29 +23,64 @@ public class MainFrame {
 
             // ===== Gradient Background Panel =====
             JPanel mainPanel = new JPanel(new BorderLayout()) {
+                private BufferedImage ispImage;
+
+                {
+                    try {
+                        ispImage = ImageIO.read(new File("assests/isp.png"));
+                    } catch (Exception e) {
+                        System.err.println("Could not load image: " + e.getMessage());
+                    }
+                }
+
                 @Override
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
                     Graphics2D g2 = (Graphics2D) g;
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
-                    GradientPaint gp = new GradientPaint(
-                            0, 0, new Color(15, 23, 42),
-                            0, getHeight(), new Color(30, 41, 59)
-                    );
-                    g2.setPaint(gp);
+                    // Draw animated background image
+                    if (ispImage != null) {
+                        // Scale image to fill the panel
+                        double scaleX = (double) getWidth() / ispImage.getWidth();
+                        double scaleY = (double) getHeight() / ispImage.getHeight();
+                        double scale = Math.max(scaleX, scaleY);
+
+                        int scaledWidth = (int) (ispImage.getWidth() * scale);
+                        int scaledHeight = (int) (ispImage.getHeight() * scale);
+                        int x = (getWidth() - scaledWidth) / 2;
+                        int y = (getHeight() - scaledHeight) / 2;
+
+                        AffineTransform at = AffineTransform.getTranslateInstance(
+                                getWidth() / 2.0,
+                                getHeight() / 2.0
+                        );
+                        at.rotate(Math.toRadians(imageRotation * 0.3)); // Slower rotation
+                        at.scale(scale, scale);
+                        at.translate(-ispImage.getWidth() / 2.0, -ispImage.getHeight() / 2.0);
+
+                        Composite oldComposite = g2.getComposite();
+                        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha));
+                        g2.drawImage(ispImage, at, null);
+                        g2.setComposite(oldComposite);
+                    }
+
+                    // Semi-transparent dark overlay for readability
+                    g2.setColor(new Color(0, 0, 0, (int) (100 + imageAlpha * 80)));
                     g2.fillRect(0, 0, getWidth(), getHeight());
                 }
             };
 
             // ===== TITLE =====
-            JLabel title = new JLabel("ISP Management System", SwingConstants.CENTER);
-            title.setFont(new Font("Segoe UI", Font.BOLD, 32));
+            JLabel title = new JLabel("Welcome to ISP Management System", SwingConstants.CENTER);
+            title.setFont(new Font("Segoe UI", Font.BOLD, 24));
             title.setForeground(Color.WHITE);
-            title.setBorder(BorderFactory.createEmptyBorder(40, 10, 30, 10));
+            title.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
             // ===== BUTTON PANEL =====
-            JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 25, 25));
-            buttonPanel.setBorder(BorderFactory.createEmptyBorder(40, 170, 40, 170));
+            JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 15, 15));
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 170, 30, 170));
             buttonPanel.setOpaque(false);
 
             // ===== BUTTONS =====
@@ -79,6 +121,19 @@ public class MainFrame {
 
             frame.add(mainPanel);
 
+            // ===== ANIMATION LOOP =====
+            Timer animationTimer = new Timer(16, e -> {
+                if (imageAlpha < 1.0f) {
+                    imageAlpha = Math.min(imageAlpha + 0.02f, 1.0f);
+                }
+                if (imageScale < 1.0f) {
+                    imageScale = Math.min(imageScale + 0.015f, 1.0f);
+                }
+                imageRotation = (imageRotation + 0.5f) % 360;
+                mainPanel.repaint();
+            });
+            animationTimer.start();
+
             // ===== OPEN WINDOWS =====
             dashboard.addActionListener(e -> new Dashboard());
             addCustomer.addActionListener(e -> new CustomerForm());
@@ -89,6 +144,7 @@ public class MainFrame {
             frame.setVisible(true);
         });
     }
+
 
     // ===== Styled Rounded Button =====
     private static JButton createStyledButton(String text, Color normal, Color hover) {
