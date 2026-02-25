@@ -121,22 +121,27 @@ public class LoginFrame extends JFrame {
             return;
         }
 
-        // Demo login check (replace with database later)
-        if (username.equals("admin") && password.equals("1234")) {
+        // Admin credentials
+        if (username.equals("Admin001") && password.equals("Admin@123")) {
             JOptionPane.showMessageDialog(this,
-                    "Login Successful!",
+                    "Admin Login Successful!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
 
             dispose(); // Close login window
+            new AdminFrame().setVisible(true);
+        }
+        // User credentials
+        else if (username.equals("user001") && password.equals("user@123")) {
+            JOptionPane.showMessageDialog(this,
+                    "User Login Successful!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
 
-            // Open dashboard (placeholder)
-            JFrame dashboard = new JFrame("Dashboard");
-            dashboard.setSize(400, 300);
-            dashboard.setLocationRelativeTo(null);
-            dashboard.add(new JLabel("Welcome to ISP Dashboard", SwingConstants.CENTER));
-            dashboard.setVisible(true);
-        } else {
+            dispose(); // Close login window
+            new CustomerFrame().setVisible(true);
+        }
+        else {
             JOptionPane.showMessageDialog(this,
                     "Invalid username or password.",
                     "Login Failed",
