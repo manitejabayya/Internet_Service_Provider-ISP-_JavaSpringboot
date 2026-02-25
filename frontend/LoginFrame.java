@@ -11,7 +11,7 @@ public class LoginFrame extends JFrame {
         setTitle("ISP Login");
         setSize(500, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE); // important
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(400, 350));
         setLayout(new BorderLayout());
 
@@ -39,6 +39,7 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(10, 15, 10, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // ===== TITLE =====
         JLabel title = new JLabel("ISP Management Login");
         title.setFont(new Font("Segoe UI", Font.BOLD, 22));
         title.setForeground(Color.WHITE);
@@ -50,6 +51,7 @@ public class LoginFrame extends JFrame {
         mainPanel.add(title, gbc);
         gbc.gridwidth = 1;
 
+        // ===== USERNAME =====
         gbc.gridy++;
         gbc.gridx = 0;
         JLabel userLabel = new JLabel("Username");
@@ -61,6 +63,7 @@ public class LoginFrame extends JFrame {
         styleField(usernameField);
         mainPanel.add(usernameField, gbc);
 
+        // ===== PASSWORD =====
         gbc.gridy++;
         gbc.gridx = 0;
         JLabel passLabel = new JLabel("Password");
@@ -72,6 +75,27 @@ public class LoginFrame extends JFrame {
         styleField(passwordField);
         mainPanel.add(passwordField, gbc);
 
+        // ===== LOGIN BUTTON =====
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+
+        JButton loginBtn = new JButton("Login");
+        loginBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        loginBtn.setBackground(new Color(59, 130, 246));
+        loginBtn.setForeground(Color.WHITE);
+        loginBtn.setFocusPainted(false);
+        loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        loginBtn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Login button action
+        loginBtn.addActionListener(e -> performLogin());
+
+        mainPanel.add(loginBtn, gbc);
+
+        // Make Enter key trigger login
+        getRootPane().setDefaultButton(loginBtn);
+
         add(mainPanel, BorderLayout.CENTER);
     }
 
@@ -81,6 +105,43 @@ public class LoginFrame extends JFrame {
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
         field.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+    }
+
+    // ===== LOGIN LOGIC =====
+    private void performLogin() {
+
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Please enter both username and password.",
+                    "Login Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Demo login check (replace with database later)
+        if (username.equals("admin") && password.equals("1234")) {
+            JOptionPane.showMessageDialog(this,
+                    "Login Successful!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            dispose(); // Close login window
+
+            // Open dashboard (placeholder)
+            JFrame dashboard = new JFrame("Dashboard");
+            dashboard.setSize(400, 300);
+            dashboard.setLocationRelativeTo(null);
+            dashboard.add(new JLabel("Welcome to ISP Dashboard", SwingConstants.CENTER));
+            dashboard.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid username or password.",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void main(String[] args) {
