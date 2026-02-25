@@ -3,11 +3,13 @@ package com.ispautomation.isp;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/*
+ * Main Spring Boot Application
+ */
 @SpringBootApplication
 public class IspApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(IspApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(IspApplication.class, args);
+    }
 }
