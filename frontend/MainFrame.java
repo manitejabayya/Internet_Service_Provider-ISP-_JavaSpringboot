@@ -1,76 +1,142 @@
-import javax.swing.*; // Swing components (JFrame, JButton, etc.)
-import java.awt.*; // Layouts, fonts, colors
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class MainFrame {
 
     public static void main(String[] args) {
 
-        // Create main window (JFrame)
-        JFrame frame = new JFrame("ISP Management System");
+        SwingUtilities.invokeLater(() -> {
 
-        // Set window size (width, height)
-        frame.setSize(500, 400);
+            JFrame frame = new JFrame("ISP Management System");
+            frame.setSize(750, 550);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLocationRelativeTo(null);
+            frame.setMinimumSize(new Dimension(600, 500));
 
-        // Close program when user clicks X
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            // ===== Gradient Background Panel =====
+            JPanel mainPanel = new JPanel(new BorderLayout()) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2 = (Graphics2D) g;
 
-        // Center window on screen
-        frame.setLocationRelativeTo(null);
+                    GradientPaint gp = new GradientPaint(
+                            0, 0, new Color(15, 23, 42),
+                            0, getHeight(), new Color(30, 41, 59)
+                    );
+                    g2.setPaint(gp);
+                    g2.fillRect(0, 0, getWidth(), getHeight());
+                }
+            };
 
-        // ===== TITLE LABEL =====
-        // Create title text in center
-        JLabel title = new JLabel("ISP Management System", SwingConstants.CENTER);
+            // ===== TITLE =====
+            JLabel title = new JLabel("ISP Management System", SwingConstants.CENTER);
+            title.setFont(new Font("Segoe UI", Font.BOLD, 32));
+            title.setForeground(Color.WHITE);
+            title.setBorder(BorderFactory.createEmptyBorder(40, 10, 30, 10));
 
-        // Set font: Arial, Bold, size 20
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+            // ===== BUTTON PANEL =====
+            JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 25, 25));
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(40, 170, 40, 170));
+            buttonPanel.setOpaque(false);
 
-        // Add spacing around title (top, left, bottom, right)
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+            // ===== BUTTONS =====
+            JButton dashboard = createStyledButton(
+                    "Dashboard",
+                    new Color(14, 165, 233),
+                    new Color(56, 189, 248));
 
-        // ===== BUTTON PANEL =====
-        // Panel holds buttons in grid layout
-        JPanel panel = new JPanel();
+            JButton addCustomer = createStyledButton(
+                    "Add Customer",
+                    new Color(37, 99, 235),
+                    new Color(59, 130, 246));
 
-        // 4 rows, 1 column, spacing between buttons
-        panel.setLayout(new GridLayout(4, 1, 10, 10));
+            JButton viewCustomers = createStyledButton(
+                    "View Customers",
+                    new Color(16, 185, 129),
+                    new Color(34, 197, 94));
 
-        // Padding around panel
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 80, 20, 80));
+            JButton plans = createStyledButton(
+                    "Plans",
+                    new Color(168, 85, 247),
+                    new Color(139, 92, 246));
 
-        // ===== BUTTONS =====
-        JButton addCustomer = new JButton("Add Customer");
-        JButton viewCustomers = new JButton("View Customers");
-        JButton plans = new JButton("Plans");
-        JButton exit = new JButton("Exit");
+            JButton exit = createStyledButton(
+                    "Exit",
+                    new Color(239, 68, 68),
+                    new Color(220, 38, 38));
 
-        // Add buttons to panel
-        panel.add(addCustomer);
-        panel.add(viewCustomers);
-        panel.add(plans);
-        panel.add(exit);
+            // Add buttons to panel
+            buttonPanel.add(dashboard);
+            buttonPanel.add(addCustomer);
+            buttonPanel.add(viewCustomers);
+            buttonPanel.add(plans);
+            buttonPanel.add(exit);
 
-        // ===== FRAME LAYOUT =====
-        // BorderLayout divides window into regions
-        frame.setLayout(new BorderLayout());
+            mainPanel.add(title, BorderLayout.NORTH);
+            mainPanel.add(buttonPanel, BorderLayout.CENTER);
 
-        // Title at top
-        frame.add(title, BorderLayout.NORTH);
+            frame.add(mainPanel);
 
-        // Buttons in center
-        frame.add(panel, BorderLayout.CENTER);
+            // ===== OPEN WINDOWS =====
+            dashboard.addActionListener(e -> new Dashboard());
+            addCustomer.addActionListener(e -> new CustomerForm());
+            viewCustomers.addActionListener(e -> new ViewCustomers());
+            plans.addActionListener(e -> new Plans());
+            exit.addActionListener(e -> System.exit(0));
 
-        // ===== BUTTON ACTION =====
+            frame.setVisible(true);
+        });
+    }
 
-        // Add Customer button → open customer form
-        addCustomer.addActionListener(e -> new CustomerForm());
+    // ===== Styled Rounded Button =====
+    private static JButton createStyledButton(String text, Color normal, Color hover) {
 
-        //Add view customer button -> open view
-        viewCustomers.addActionListener(e -> new ViewCustomers());
+        JButton button = new JButton(text) {
 
-        // When Exit button clicked → close program
-        exit.addActionListener(e -> System.exit(0));
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Make window visible
-        frame.setVisible(true);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 35, 35);
+
+                super.paintComponent(g);
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {}
+        };
+
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        button.setForeground(Color.WHITE);
+        button.setBackground(normal);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Smooth Hover Effect
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hover);
+                button.setPreferredSize(new Dimension(
+                        button.getWidth() + 5,
+                        button.getHeight() + 5
+                ));
+                button.revalidate();
+            }
+
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(normal);
+                button.setPreferredSize(null);
+                button.revalidate();
+            }
+        });
+
+        return button;
     }
 }
